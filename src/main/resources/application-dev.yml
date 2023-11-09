@@ -1,0 +1,33 @@
+# 路径前缀
+server:
+  port: 8118
+  servlet:
+    context-path: /cloud
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/EinziegCloud?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:
+      database: 0
+      timeout: 10000
+      lettuce:
+        shutdown-timeout: 1000
+  email:
+    host: smtp.office365.com
+    username: *
+    password: *
+    port: 587
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/*Mapper.xml
+  type-aliases-package: com.cloud.entity
+  configuration:
+    map-underscore-to-camel-case: true  #开启驼峰命名法
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #打印sql语句
