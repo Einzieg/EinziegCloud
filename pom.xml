@@ -117,13 +117,12 @@
 			<version>0.11.5</version>
 		</dependency>
 
-		<!--redis-->
+		<!-- redis -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-redis</artifactId>
 		</dependency>
-
-		<!-- https://mvnrepository.com/artifact/redis.clients/jedis -->
+		<!-- jedis -->
 		<dependency>
 			<groupId>redis.clients</groupId>
 			<artifactId>jedis</artifactId>

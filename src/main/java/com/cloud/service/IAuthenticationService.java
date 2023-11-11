@@ -10,4 +10,7 @@ public interface IAuthenticationService {
 	Msg<?> register(HttpServletRequest request, RegisterRequest registerRequest);
 
 	Msg<?> login(HttpServletRequest request, AuthenticationRequest auth);
+
+	Msg<?> sendVerificationCode(String email);
+
 }

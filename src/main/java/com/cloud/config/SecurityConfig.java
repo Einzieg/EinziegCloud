@@ -42,7 +42,7 @@ public class SecurityConfig {
 				.csrf(AbstractHttpConfigurer::disable)
 				// 配置请求授权规则
 				.authorizeHttpRequests(authorize -> authorize
-						.requestMatchers(HttpMethod.GET, "/", "index.html").permitAll()
+						.requestMatchers(HttpMethod.GET, "/", "index.html", "/auth/**").permitAll()
 						.requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
 						.anyRequest()
 						.authenticated())

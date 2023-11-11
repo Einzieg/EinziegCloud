@@ -6,8 +6,10 @@ import com.cloud.service.IAuthenticationService;
 import com.cloud.util.annotation.OLog;
 import com.cloud.util.msg.Msg;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,5 +34,10 @@ public class AuthenticationController {
 		return authenticationService.login(request, auth);
 	}
 
+	@GetMapping("/mail")
+	@OLog(model = "用户模块", type = "邮件", detail = "发送邮件")
+	public Msg<?> mail(@Email String email) {
+		return authenticationService.sendVerificationCode(email);
+	}
 
 }

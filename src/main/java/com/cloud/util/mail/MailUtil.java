@@ -38,7 +38,7 @@ public class MailUtil {
 	 * @param to           接收方
 	 * @param mailTemplate 邮件模板
 	 */
-	public void sendMail(String to, MailTemplate mailTemplate) throws MessagingException, IOException {
+	public String sendMail(String to, MailTemplate mailTemplate) throws MessagingException, IOException {
 		System.out.println(USERNAME + " - " + PASSWORD + " - " + HOST + " - " + PORT);
 		Properties props = new Properties();
 		props.put("mail.smtp.host", HOST);
@@ -74,6 +74,7 @@ public class MailUtil {
 		message.setContent(processedEmailContent, "text/html;charset=UTF-8");
 		// 发送邮件
 		Transport.send(message);
+		return verifyCode;
 	}
 
 	/**

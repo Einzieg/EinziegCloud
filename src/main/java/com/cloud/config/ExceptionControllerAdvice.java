@@ -2,13 +2,12 @@ package com.cloud.config;
 
 import com.cloud.util.msg.Msg;
 import com.cloud.util.msg.ResultCode;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Objects;
@@ -28,6 +27,12 @@ public class ExceptionControllerAdvice {
 	public Msg<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
 		log.error("参数校验异常: {}", Objects.requireNonNull(e.getBindingResult().getFieldError()).getDefaultMessage(), e);
 		return new Msg<>(ResultCode.VALIDATE_FAILED, Objects.requireNonNull(e.getBindingResult().getFieldError()).getDefaultMessage());
+	}
+
+	@ExceptionHandler(ConstraintViolationException.class)
+	public Msg<?> handleConstraintViolationException(ConstraintViolationException e) {
+		log.error("参数校验异常: {}", e.getMessage(), e);
+		return new Msg<>(ResultCode.VALIDATE_FAILED, e.getMessage());
 	}
 
 	@ExceptionHandler(DisabledException.class)
