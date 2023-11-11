@@ -52,9 +52,9 @@ public class AuthenticationService implements IAuthenticationService {
 		if (userService.loadUserByEmail(registerRequest.getEmail()).isPresent()) {
 			return Msg.fail("该用户已存在");
 		}
-		String verifyCode = (String) redisUtil.get(registerRequest.getEmail());
-		if (StringUtils.isEmpty(registerRequest.getVerificationCode()) ||
-				!registerRequest.getVerificationCode().equals(verifyCode)) {
+		Map<Object,Object> map = redisUtil.getHash(registerRequest.getEmail());
+		String verifyCode = map.get("verifyCode").toString();
+		if (!registerRequest.getVerificationCode().equals(verifyCode)) {
 			return Msg.fail("验证码错误");
 		}
 		var user = User.builder()
