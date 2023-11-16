@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
 	@GetMapping("/hello")
-	@OLog(model = "用户模块", type = "测试", detail = "测试")
+	@OLog(model = "用户模块", detail = "测试")
 	public Msg<String> hello() {
 		return Msg.success("Hello World");
 	}

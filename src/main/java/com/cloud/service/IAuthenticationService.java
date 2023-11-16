@@ -11,6 +11,6 @@ public interface IAuthenticationService {
 
 	Msg<?> login(HttpServletRequest request, AuthenticationRequest auth);
 
-	Msg<?> sendVerificationCode(String email);
+	Msg<?> sendVerificationCode(String email, String type);
 
 }

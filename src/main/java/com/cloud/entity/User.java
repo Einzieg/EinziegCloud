@@ -1,17 +1,12 @@
 package com.cloud.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.cloud.util.JwtUtil;
 import com.cloud.util.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,7 +21,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("USER")
+@TableName("CLOUD_USER")
 public class User implements Serializable, UserDetails {
 
 	@Serial
@@ -41,13 +36,16 @@ public class User implements Serializable, UserDetails {
 	@TableField("PASSWORD")
 	private String password;
 
+	@TableField("NAME")
+	private String name;
+
 	@EnumValue()
 	private Role role;
 
 	@TableField(value = "REGISTER_DATE", fill = FieldFill.INSERT)
 	private Date registerDate;
 
-	@TableField(value = "LAST_LOGIN_DATE", fill = FieldFill.UPDATE)
+	@TableField(value = "LAST_LOGIN_DATE", fill = FieldFill.INSERT_UPDATE)
 	private Date lastLoginDate;
 
 	@TableField(value = "REGISTER_IP")

@@ -2,9 +2,12 @@ package com.cloud.config;
 
 import com.cloud.util.msg.Msg;
 import com.cloud.util.msg.ResultCode;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -18,6 +21,17 @@ import java.util.Objects;
 public class ExceptionControllerAdvice {
 
 	/**
+	 * JWT-TOKEN过期异常
+	 *
+	 * @param e {@link ExpiredJwtException}
+	 * @return {@code Msg<?>}
+	 */
+	@ExceptionHandler(ExpiredJwtException.class)
+	public Msg<?> handleExpiredJwtException(ExpiredJwtException e) {
+		return Msg.fail(ResultCode.TOKEN_EXPIRED);
+	}
+
+	/**
 	 * 参数校验异常
 	 *
 	 * @param e {@link MethodArgumentNotValidException}
@@ -25,20 +39,45 @@ public class ExceptionControllerAdvice {
 	 */
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public Msg<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-		log.error("参数校验异常: {}", Objects.requireNonNull(e.getBindingResult().getFieldError()).getDefaultMessage(), e);
 		return new Msg<>(ResultCode.VALIDATE_FAILED, Objects.requireNonNull(e.getBindingResult().getFieldError()).getDefaultMessage());
 	}
 
 	@ExceptionHandler(ConstraintViolationException.class)
 	public Msg<?> handleConstraintViolationException(ConstraintViolationException e) {
-		log.error("参数校验异常: {}", e.getMessage(), e);
 		return new Msg<>(ResultCode.VALIDATE_FAILED, e.getMessage());
 	}
 
+	/**
+	 * 凭据无效异常
+	 *
+	 * @param e {@link BadCredentialsException}
+	 * @return {@code Msg<?>}
+	 */
+	@ExceptionHandler(BadCredentialsException.class)
+	public Msg<?> handleBadCredentialsException(BadCredentialsException e) {
+		return Msg.fail(ResultCode.BAD_CREDENTIALS);
+	}
+
+	/**
+	 * 账户禁用异常
+	 *
+	 * @param e {@link DisabledException}
+	 * @return {@code Msg<?>}
+	 */
 	@ExceptionHandler(DisabledException.class)
 	public Msg<?> handleDisabledException(DisabledException e) {
-		log.error("账户被禁用: {}", e.getMessage(), e);
-		return new Msg<>(ResultCode.FAILED, e.getMessage());
+		return Msg.fail(ResultCode.DISABLE);
+	}
+
+	/**
+	 * 账户锁定异常
+	 *
+	 * @param e {@link LockedException}
+	 * @return {@code Msg<?>}
+	 */
+	@ExceptionHandler(LockedException.class)
+	public Msg<?> handleLockedException(LockedException e) {
+		return Msg.fail(ResultCode.LOCKED);
 	}
 
 	/**

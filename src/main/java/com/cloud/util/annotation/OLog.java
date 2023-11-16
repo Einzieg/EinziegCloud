@@ -1,6 +1,9 @@
 package com.cloud.util.annotation;
 
-import java.lang.annotation.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * 自定义操作异常日志管理注解，用于AOP
@@ -9,11 +12,8 @@ import java.lang.annotation.*;
  */
 @Target(ElementType.METHOD) // 注解放置的目标位置,METHOD是可注解在方法级别上
 @Retention(RetentionPolicy.RUNTIME) // 注解在哪个阶段执行
-@Documented // 生成文档
 public @interface OLog {
 	String model() default ""; // 操作模块
-
-	String type() default "";  // 操作类型
 
 	String detail() default "";  // 操作说明
 }

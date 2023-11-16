@@ -23,21 +23,21 @@ public class AuthenticationController {
 	private final IAuthenticationService authenticationService;
 
 	@PostMapping("/register")
-	@OLog(model = "用户模块", type = "注册", detail = "用户注册")
+	@OLog(model = "用户模块", detail = "用户注册")
 	public Msg<?> register(HttpServletRequest request, @Validated RegisterRequest registerRequest) {
 		return authenticationService.register(request, registerRequest);
 	}
 
 	@PostMapping("/login")
-	@OLog(model = "用户模块", type = "登录", detail = "用户登录")
+	@OLog(model = "用户模块", detail = "用户登录")
 	public Msg<?> login(HttpServletRequest request, AuthenticationRequest auth) {
 		return authenticationService.login(request, auth);
 	}
 
 	@GetMapping("/mail")
-	@OLog(model = "用户模块", type = "邮件", detail = "发送邮件")
-	public Msg<?> mail(@Email String email) {
-		return authenticationService.sendVerificationCode(email);
+	@OLog(model = "用户模块", detail = "注册邮件")
+	public Msg<?> mail(@Email String email, String type) {
+		return authenticationService.sendVerificationCode(email, type);
 	}
 
 }

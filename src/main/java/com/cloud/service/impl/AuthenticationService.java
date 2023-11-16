@@ -1,6 +1,5 @@
 package com.cloud.service.impl;
 
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.cloud.entity.User;
 import com.cloud.entity.request.AuthenticationRequest;
 import com.cloud.entity.request.RegisterRequest;
@@ -14,6 +13,7 @@ import com.cloud.util.Role;
 import com.cloud.util.mail.MailTemplate;
 import com.cloud.util.mail.MailUtil;
 import com.cloud.util.msg.Msg;
+import com.cloud.util.msg.ResultCode;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,17 +50,21 @@ public class AuthenticationService implements IAuthenticationService {
 	 */
 	public Msg<?> register(HttpServletRequest request, RegisterRequest registerRequest) {
 		if (userService.loadUserByEmail(registerRequest.getEmail()).isPresent()) {
-			return Msg.fail("该用户已存在");
+			return Msg.fail(ResultCode.ALREADY_REGISTERED);
 		}
-		Map<Object,Object> map = redisUtil.getHash(registerRequest.getEmail());
-		String verifyCode = map.get("verifyCode").toString();
-		if (!registerRequest.getVerificationCode().equals(verifyCode)) {
-			return Msg.fail("验证码错误");
+		Map<Object, Object> map = redisUtil.getHash(registerRequest.getEmail());
+		if (null == redisUtil.getHash(registerRequest.getEmail()).get("verifyCode")) {
+			return Msg.fail(ResultCode.VALIDATE_CODE_EXPIRED);
+		}
+		if (!registerRequest.getVerificationCode().equals(map.get("verifyCode").toString())) {
+			return Msg.fail(ResultCode.VALIDATE_CODE_FAILED);
 		}
 		var user = User.builder()
 				.email(registerRequest.getEmail())
+				.name("用户" + System.currentTimeMillis())
 				.password(passwordEncoder.encode(registerRequest.getPassword()))
 				.role(Role.USER)
+				.registerIp(IPUtils.getIpAddr(request))
 				.build();
 		user.setRegisterIp(IPUtils.getIpAddr(request));
 		userService.save(user);
@@ -95,12 +99,15 @@ public class AuthenticationService implements IAuthenticationService {
 	 * @param email 邮箱
 	 * @return {@code Msg<?>}
 	 */
-	public Msg<?> sendVerificationCode(String email) {
+	public Msg<?> sendVerificationCode(String email, String type) {
+		if ("register".equals(type) && userService.loadUserByEmail(email).isPresent()) {
+			return Msg.fail(ResultCode.ALREADY_REGISTERED);
+		}
 		Map<Object, Object> redisMap = redisUtil.getHash(email);
 		if (redisMap.get("time") != null) {
 			// 计算当前时间与redis中的时间差，如果小于60秒则不允许再次发送邮件
 			if (System.currentTimeMillis() - Long.parseLong(redisMap.get("time").toString()) < 60000) {
-				return Msg.fail("请勿频繁发送邮件");
+				return Msg.fail(ResultCode.TOO_MANY_REQUESTS);
 			}
 		}
 		try {
