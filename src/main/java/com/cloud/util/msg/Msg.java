@@ -1,7 +1,12 @@
 package com.cloud.util.msg;
 
+import com.alibaba.fastjson2.JSON;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+
+import java.io.IOException;
 
 /**
  * 统一返回结果类
@@ -109,6 +114,12 @@ public class Msg<T> {
 		return msg;
 	}
 
+	public Msg(ResultCode resultCode) {
+		this.code = resultCode.getCode();
+		this.msg = resultCode.getMsg();
+		this.timestamp = System.currentTimeMillis();
+	}
+
 	/**
 	 * 自定义返回状态码、消息、数据
 	 *
@@ -122,4 +133,12 @@ public class Msg<T> {
 		this.timestamp = System.currentTimeMillis();
 	}
 
+	public static void returnMsg(HttpServletResponse response, ResultCode resultCode) throws IOException {
+		response.setContentType("application/json;charset=utf-8");
+		ServletOutputStream os = response.getOutputStream();
+		String jsonString = JSON.toJSONString(new Msg<>(resultCode));
+		os.write(jsonString.getBytes());
+		os.flush();
+		os.close();
+	}
 }

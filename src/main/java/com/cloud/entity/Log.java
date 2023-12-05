@@ -11,7 +11,7 @@ import java.util.Date;
 
 @Data
 @Builder
-@TableName("CLOUD_LOG")
+@TableName("cloud_log")
 public class Log {
 
 	/**

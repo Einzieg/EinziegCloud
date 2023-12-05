@@ -7,7 +7,8 @@ import java.util.Optional;
 
 public interface IUserService extends IService<User> {
 
-	Optional<User> loadUserByEmail(String Email);
+	Optional<User> findUserByEmail(String email);
 
+	Optional<User> findUserByName(String name);
 
 }

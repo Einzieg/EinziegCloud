@@ -1,29 +1,35 @@
 package com.cloud.service.impl;
 
+import com.alibaba.fastjson2.JSON;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cloud.entity.AuthenticationDTO;
 import com.cloud.entity.User;
+import com.cloud.entity.UserRole;
 import com.cloud.entity.request.AuthenticationRequest;
 import com.cloud.entity.request.RegisterRequest;
 import com.cloud.entity.response.AuthenticationResponse;
+import com.cloud.mapper.AuthenticationMapper;
 import com.cloud.service.IAuthenticationService;
+import com.cloud.service.IUserRoleService;
 import com.cloud.service.IUserService;
-import com.cloud.util.IPUtils;
+import com.cloud.util.HttpUtil;
+import com.cloud.util.IPUtil;
 import com.cloud.util.JwtUtil;
 import com.cloud.util.RedisUtil;
-import com.cloud.util.Role;
-import com.cloud.util.mail.MailTemplate;
-import com.cloud.util.mail.MailUtil;
 import com.cloud.util.msg.Msg;
 import com.cloud.util.msg.ResultCode;
-import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * 身份验证服务
@@ -33,27 +39,29 @@ import java.util.Map;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AuthenticationService implements IAuthenticationService {
+public class AuthenticationService extends ServiceImpl<AuthenticationMapper, AuthenticationDTO> implements IAuthenticationService {
 
 	private final IUserService userService;
+	private final IUserRoleService userRoleService;
 	private final PasswordEncoder passwordEncoder;
 	private final AuthenticationManager authenticationManager;
 	private final JwtUtil jwtUtil;
-	private final MailUtil mailUtil;
 	private final RedisUtil redisUtil;
 
 	/**
 	 * 用户注册
 	 *
-	 * @param request {@link RegisterRequest}
 	 * @return {@code AuthenticationResponse}
 	 */
-	public Msg<?> register(HttpServletRequest request, RegisterRequest registerRequest) {
-		if (userService.loadUserByEmail(registerRequest.getEmail()).isPresent()) {
+	public Msg<?> register(RegisterRequest registerRequest) {
+		if (userService.findUserByName(registerRequest.getUsername()).isPresent()) {
 			return Msg.fail(ResultCode.ALREADY_REGISTERED);
 		}
+		if (userService.findUserByEmail(registerRequest.getEmail()).isPresent()) {
+			return Msg.fail(ResultCode.EMAIL_ALREADY_REGISTERED);
+		}
 		Map<Object, Object> map = redisUtil.getHash(registerRequest.getEmail());
-		if (null == redisUtil.getHash(registerRequest.getEmail()).get("verifyCode")) {
+		if (null == map.get("verifyCode")) {
 			return Msg.fail(ResultCode.VALIDATE_CODE_EXPIRED);
 		}
 		if (!registerRequest.getVerificationCode().equals(map.get("verifyCode").toString())) {
@@ -61,65 +69,84 @@ public class AuthenticationService implements IAuthenticationService {
 		}
 		var user = User.builder()
 				.email(registerRequest.getEmail())
-				.name("用户" + System.currentTimeMillis())
+				.name(registerRequest.getUsername())
 				.password(passwordEncoder.encode(registerRequest.getPassword()))
-				.role(Role.USER)
-				.registerIp(IPUtils.getIpAddr(request))
+				.registerIp(IPUtil.getIpAddr())
 				.build();
-		user.setRegisterIp(IPUtils.getIpAddr(request));
+		log.info("用户{}注册", user.toString());
 		userService.save(user);
-		var jwtToken = jwtUtil.generateToken(user);
+
+		userRoleService.save(
+				UserRole.builder()
+						.userId(user.getId())
+						.roleId("3")
+						.build()
+		);
+
+		var authentication = loadUserByName(user.getName()).orElseThrow();
+		redisUtil.set(authentication.getName(), JSON.toJSON(authentication).toString(), 60 * 60 * 24);
+		redisUtil.del(registerRequest.getEmail());
+		var jwtToken = jwtUtil.generateToken(authentication);
 		return Msg.success(AuthenticationResponse.builder().token(jwtToken).build());
 	}
 
 	/**
-	 * 进行身份验证
+	 * 登录身份验证
 	 *
 	 * @param auth {@link AuthenticationRequest}
 	 * @return {@code AuthenticationResponse}
 	 */
-	public Msg<?> login(HttpServletRequest request, AuthenticationRequest auth) {
+	public Msg<?> login(AuthenticationRequest auth) {
 		authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(
-						auth.getEmail(),
+						auth.getUsername(),
 						auth.getPassword()
 				)
 		);
-		var user = userService.loadUserByEmail(auth.getEmail()).orElseThrow();
-		var jwtToken = jwtUtil.generateToken(user);
+		var authentication = loadUserByRedis(auth.getUsername()).orElseThrow();
+		var jwtToken = jwtUtil.generateToken(authentication);
+
+		var user = userService.getById(authentication.getId());
+		user.setLastLoginIp(IPUtil.getIpAddr());
 		user.setToken(jwtToken);
-		user.setLastLoginIp(IPUtils.getIpAddr(request));
 		userService.updateById(user);
 		return Msg.success(AuthenticationResponse.builder().token(jwtToken).build());
 	}
 
 	/**
-	 * 发送验证码
+	 * 用户登出
 	 *
-	 * @param email 邮箱
 	 * @return {@code Msg<?>}
 	 */
-	public Msg<?> sendVerificationCode(String email, String type) {
-		if ("register".equals(type) && userService.loadUserByEmail(email).isPresent()) {
-			return Msg.fail(ResultCode.ALREADY_REGISTERED);
+	public Msg<?> logout(HttpServletResponse response) {
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth != null) {
+			log.info("用户{}登出", auth.getName());
+			redisUtil.del(auth.getName());
+			// 清除认证
+			new SecurityContextLogoutHandler().logout(HttpUtil.getHttpServletRequest(), response, auth);
 		}
-		Map<Object, Object> redisMap = redisUtil.getHash(email);
-		if (redisMap.get("time") != null) {
-			// 计算当前时间与redis中的时间差，如果小于60秒则不允许再次发送邮件
-			if (System.currentTimeMillis() - Long.parseLong(redisMap.get("time").toString()) < 60000) {
-				return Msg.fail(ResultCode.TOO_MANY_REQUESTS);
-			}
+		return Msg.success();
+	}
+
+	/**
+	 * 加载用户
+	 *
+	 * @param name 用户名
+	 * @return {@code Optional<User>}
+	 */
+	@Override
+	public Optional<AuthenticationDTO> loadUserByName(String name) {
+		var auth = baseMapper.loadAuthentication(name);
+		if (auth != null) {
+			redisUtil.set(auth.getName(), JSON.toJSON(auth).toString(), 60 * 60 * 24);
 		}
-		try {
-			Map<String, Object> map = new HashMap<>();
-			map.put("verifyCode", mailUtil.sendMail(email, MailTemplate.REGISTER));
-			map.put("time", String.valueOf(System.currentTimeMillis()));
-			redisUtil.setHash(email, map, 60 * 15);
-			return Msg.success("邮件发送成功");
-		} catch (Exception e) {
-			log.error("发送邮件失败", e);
-			return Msg.fail("邮件发送失败" + e.getMessage());
-		}
+		return Optional.ofNullable(auth).isEmpty() ? Optional.empty() : Optional.of(auth);
+	}
+
+	public Optional<AuthenticationDTO> loadUserByRedis(String name) {
+		var auth = JSON.parseObject(String.valueOf(redisUtil.get(name)), AuthenticationDTO.class);
+		return null == auth ? loadUserByName(name) : Optional.of(auth);
 	}
 
 }

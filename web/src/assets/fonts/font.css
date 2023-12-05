@@ -1,0 +1,13 @@
+@font-face {
+	font-family: HarmonyOS_Sans_SC_Medium;
+	font-style: normal;
+	font-display: swap;
+	/*src: url("../fonts/HarmonyOS_Sans_Regular.ttf");*/
+	src: url("https://cdn.jsdelivr.net/gh/irozhi/HarmonyOS-Sans/HarmonyOS_Sans_SC/HarmonyOS_Sans_SC_Medium.woff2") format('woff2'),
+	url("https://cdn.jsdelivr.net/gh/irozhi/HarmonyOS-Sans/HarmonyOS_Sans_SC/HarmonyOS_Sans_SC_Medium.woff") format('woff'),
+	url("HarmonyOS_Sans_SC_Medium.ttf");
+}
+
+* {
+	font-family: HarmonyOS_Sans_SC_Medium, sans-serif;
+}

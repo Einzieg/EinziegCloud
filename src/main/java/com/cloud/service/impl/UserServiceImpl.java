@@ -14,17 +14,30 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
 
+
 	/**
 	 * 根据邮箱加载用户
+	 *
 	 * @param email 邮箱
 	 * @return {@code Optional<User>}
 	 */
 	@Override
-	public Optional<User> loadUserByEmail(String email) {
-		LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
-		queryWrapper.eq(User::getEmail, email);
-		User user = this.getOne(queryWrapper);
+	public Optional<User> findUserByEmail(String email) {
+		var user = getOne(new LambdaQueryWrapper<User>().eq(User::getEmail, email));
 		return Optional.ofNullable(user).isEmpty() ? Optional.empty() : Optional.of(user);
 	}
+
+	/**
+	 * 根据用户名加载用户
+	 *
+	 * @param name 用户名
+	 * @return {@code Optional<User>}
+	 */
+	@Override
+	public Optional<User> findUserByName(String name) {
+		var user = getOne(new LambdaQueryWrapper<User>().eq(User::getName, name));
+		return Optional.ofNullable(user).isEmpty() ? Optional.empty() : Optional.of(user);
+	}
+
 
 }

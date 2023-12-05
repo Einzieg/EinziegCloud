@@ -3,6 +3,7 @@ package com.cloud.config;
 import com.cloud.util.msg.Msg;
 import com.cloud.util.msg.ResultCode;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -29,6 +30,17 @@ public class ExceptionControllerAdvice {
 	@ExceptionHandler(ExpiredJwtException.class)
 	public Msg<?> handleExpiredJwtException(ExpiredJwtException e) {
 		return Msg.fail(ResultCode.TOKEN_EXPIRED);
+	}
+
+	/**
+	 * JWT-TOKEN解析错误异常
+	 *
+	 * @param e {@link MalformedJwtException}
+	 * @return {@code Msg<?>}
+	 */
+	@ExceptionHandler(MalformedJwtException.class)
+	public Msg<?> handleMalformedJwtException(MalformedJwtException e) {
+		return Msg.fail(ResultCode.TOKEN_LAPSE);
 	}
 
 	/**

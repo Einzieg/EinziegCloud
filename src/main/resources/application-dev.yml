@@ -25,9 +25,28 @@ spring:
     password: *
     port: 587
 
+management:
+  endpoints:
+    enabled-by-default: true #暴露所有端点信息
+    web:
+      exposure:
+        include: '*'  #以web方式暴露
+  endpoint:
+    health:
+      show-details: always #显示所有的健康信息
+  health:
+    defaults:
+      enabled: true
+    db:
+      enabled: false
+
 mybatis-plus:
   mapper-locations: classpath:mapper/*Mapper.xml
   type-aliases-package: com.cloud.entity
   configuration:
-    map-underscore-to-camel-case: true  #开启驼峰命名法
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #打印sql语句
+    map-underscore-to-camel-case: true  #开启驼峰命名
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #打印sql
+
+logging:
+  level:
+    root: info

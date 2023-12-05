@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cloud.mapper.AuthenticationMapper">
+	<select id="loadAuthentication" resultType="com.cloud.entity.AuthenticationDTO">
+		SELECT cu.ID,
+			   cu.EMAIL,
+			   cu.NAME,
+			   cu.PASSWORD,
+			   cu.REGISTER_DATE,
+			   cu.LAST_LOGIN_DATE,
+			   cu.REGISTER_IP,
+			   cu.LAST_LOGIN_IP,
+			   cu.STATE,
+			   cu.LOCKED,
+			   cr.ROLE_CODE,
+			   cr.ROLE_NAME,
+			   cr.ROLE_LEVEL
+		FROM cloud_user cu
+				 RIGHT JOIN cloud_user_role cur ON cu.ID = cur.USER_ID
+				 LEFT JOIN cloud_role cr ON cur.ROLE_ID = cr.ID
+		WHERE cu.NAME = #{name}
+	</select>
+
+</mapper>

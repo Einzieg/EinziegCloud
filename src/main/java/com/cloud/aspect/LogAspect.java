@@ -9,11 +9,11 @@ import org.aspectj.lang.annotation.*;
 import org.springframework.stereotype.Component;
 
 @Slf4j
-@Aspect // 使得该切面类成为一个切面
-@Component  // 使得该切面类被Spring扫描到
+@Aspect // 使该类成为一个切面
+@Component
 public class LogAspect {
 
-	private static Long currentTime;
+	private static Long creationTime;
 
 	@Resource
 	ILogService logService;
@@ -30,10 +30,11 @@ public class LogAspect {
 	 */
 	@Around("pointcut()")
 	public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
-		currentTime = System.currentTimeMillis();
+		creationTime = System.currentTimeMillis();
 		Object o = joinPoint.proceed();
-		logService.saveLog(joinPoint, "success", currentTime, o);
-		log.info("执行方法 " + joinPoint.getSignature().getName() + " 后置环绕通知");
+		log.info("o: {}", o);
+		logService.saveLog(joinPoint, "success", creationTime, o);
+		log.debug("执行方法 " + joinPoint.getSignature().getName() + " 后置环绕通知");
 		return o;
 	}
 
@@ -42,7 +43,7 @@ public class LogAspect {
 	 */
 	@Before("pointcut()")
 	public void before(JoinPoint joinPoint) {
-		log.info("执行方法 " + joinPoint.getSignature().getName() + " 前置通知");
+		log.debug("执行方法 " + joinPoint.getSignature().getName() + " 前置通知");
 	}
 
 	/**
@@ -50,7 +51,7 @@ public class LogAspect {
 	 */
 	@AfterReturning(returning = "result", pointcut = "pointcut()")
 	public void afterReturning(JoinPoint joinPoint, Object result) {
-		log.info("执行方法 " + joinPoint.getSignature().getName() + " 返回通知，返回值：" + result);
+		log.debug("执行方法 " + joinPoint.getSignature().getName() + " 返回通知，返回值：" + result);
 	}
 
 	/**
@@ -58,7 +59,7 @@ public class LogAspect {
 	 */
 	@After("pointcut()")
 	public void after(JoinPoint joinPoint) {
-		log.info("执行方法 " + joinPoint.getSignature().getName() + " 后置通知");
+		log.debug("执行方法 " + joinPoint.getSignature().getName() + " 后置通知");
 	}
 
 	/**
@@ -66,7 +67,7 @@ public class LogAspect {
 	 */
 	@AfterThrowing(throwing = "ex", pointcut = "pointcut()")
 	public void afterThrowing(JoinPoint joinPoint, Exception ex) {
-		logService.saveLog((ProceedingJoinPoint) joinPoint, "error", currentTime, ex);
+		logService.saveLog((ProceedingJoinPoint) joinPoint, "error", creationTime, ex);
 		log.error("执行方法 " + joinPoint.getSignature().getName() + " 异常通知，异常：" + ex.getMessage());
 	}
 

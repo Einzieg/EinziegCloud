@@ -1,7 +1,7 @@
 package com.cloud.config;
 
 
-import com.cloud.service.IUserService;
+import com.cloud.service.IAuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,7 +31,7 @@ import org.springframework.web.filter.CorsFilter;
 public class SecurityConfig {
 
 	private final CorsFilter corsFilter;
-	private final IUserService userService;
+	private final IAuthenticationService authenticationService;
 	private final JwtAuthenticationFilter jwtAuthFilter;
 	private final AuthenticationProvider authenticationProvider;
 
@@ -42,7 +42,7 @@ public class SecurityConfig {
 				.csrf(AbstractHttpConfigurer::disable)
 				// 配置请求授权规则
 				.authorizeHttpRequests(authorize -> authorize
-						.requestMatchers(HttpMethod.GET, "/", "index.html", "/auth/**").permitAll()
+						.requestMatchers(HttpMethod.GET, "/mail/register", "/auth/**", "/user/**").permitAll()
 						.requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
 						.anyRequest()
 						.authenticated())
@@ -66,7 +66,7 @@ public class SecurityConfig {
 
 	@Bean
 	public UserDetailsService userDetailsService() {
-		return username -> userService.loadUserByEmail(username)
+		return username -> authenticationService.loadUserByRedis(username)
 				.orElseThrow(() -> new UsernameNotFoundException("未找到该用户"));
 	}
 
