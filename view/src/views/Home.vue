@@ -5,18 +5,6 @@
 			<div class="home">
 				<h1>Welcome to the Home page</h1>
 			</div>
-			<ClientOnly>
-				<UButton
-					:icon="isDark ? 'i-heroicons-moon-20-solid' : 'i-heroicons-sun-20-solid'"
-					aria-label="Theme"
-					color="gray"
-					variant="ghost"
-					@click="isDark = !isDark"/>
-
-				<template #fallback>
-					<div class="w-8 h-8"/>
-				</template>
-			</ClientOnly>
 
 			<div class="login">
 				<button @click="toLogin">去登录</button>

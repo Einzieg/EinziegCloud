@@ -26,3 +26,5 @@ replay_pid*
 /node_modules
 /target/
 /.idea/
+
+src/main/resources/application-dev.yml
