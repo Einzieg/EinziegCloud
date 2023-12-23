@@ -21,8 +21,8 @@ spring:
         shutdown-timeout: 1000
   email:
     host: smtp.office365.com
-    username: EinziegCloud@outlook.com
-    password: Wang791348625
+    username: *
+    password: *
     port: 587
 
 management:
