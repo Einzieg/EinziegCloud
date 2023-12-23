@@ -11,6 +11,8 @@ public enum ResultCode {
 
 	LOGIN_FAILED(500, "登录失败"),
 
+	BODY_NOT_MATCH(400, "请求体格式错误"),
+
 	TOKEN_EXPIRED(403, "token已过期"),
 
 	TOKEN_LAPSE(403, "token已失效"),
@@ -27,7 +29,7 @@ public enum ResultCode {
 
 	VALIDATE_CODE_EXPIRED(405, "验证码已过期"),
 
-	TOO_MANY_REQUESTS(429, "请求过于频繁"),
+	TOO_MANY_REQUESTS(200, "请求过于频繁"),
 
 	ALREADY_REGISTERED(507, "该用户名已存在"),
 

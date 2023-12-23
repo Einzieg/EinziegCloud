@@ -18,6 +18,7 @@ import com.cloud.util.JwtUtil;
 import com.cloud.util.RedisUtil;
 import com.cloud.util.msg.Msg;
 import com.cloud.util.msg.ResultCode;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,17 +55,22 @@ public class AuthenticationService extends ServiceImpl<AuthenticationMapper, Aut
 	 * @return {@code AuthenticationResponse}
 	 */
 	public Msg<?> register(RegisterRequest registerRequest) {
+		log.info("\n================\nname: {}, email: {}, password: {}\n================", registerRequest.getUsername(), registerRequest.getEmail(),
+				registerRequest.getPassword());
 		if (userService.findUserByName(registerRequest.getUsername()).isPresent()) {
 			return Msg.fail(ResultCode.ALREADY_REGISTERED);
 		}
 		if (userService.findUserByEmail(registerRequest.getEmail()).isPresent()) {
 			return Msg.fail(ResultCode.EMAIL_ALREADY_REGISTERED);
 		}
-		Map<Object, Object> map = redisUtil.getHash(registerRequest.getEmail());
-		if (null == map.get("verifyCode")) {
+		Map<Object, Object> map;
+		try {
+			map = redisUtil.getHash(registerRequest.getEmail());
+		} catch (IllegalArgumentException e) {
 			return Msg.fail(ResultCode.VALIDATE_CODE_EXPIRED);
 		}
-		if (!registerRequest.getVerificationCode().equals(map.get("verifyCode").toString())) {
+
+		if (!registerRequest.getVerificationCode().equals(Optional.ofNullable(map.get("verifyCode")).orElse("").toString())) {
 			return Msg.fail(ResultCode.VALIDATE_CODE_FAILED);
 		}
 		var user = User.builder()
@@ -73,7 +79,6 @@ public class AuthenticationService extends ServiceImpl<AuthenticationMapper, Aut
 				.password(passwordEncoder.encode(registerRequest.getPassword()))
 				.registerIp(IPUtil.getIpAddr())
 				.build();
-		log.info("用户{}注册", user.toString());
 		userService.save(user);
 
 		userRoleService.save(
@@ -97,6 +102,7 @@ public class AuthenticationService extends ServiceImpl<AuthenticationMapper, Aut
 	 * @return {@code AuthenticationResponse}
 	 */
 	public Msg<?> login(AuthenticationRequest auth) {
+		log.info("name: {}, password: {}", auth.getUsername(), auth.getPassword());
 		authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(
 						auth.getUsername(),
@@ -118,10 +124,10 @@ public class AuthenticationService extends ServiceImpl<AuthenticationMapper, Aut
 	 *
 	 * @return {@code Msg<?>}
 	 */
-	public Msg<?> logout(HttpServletResponse response) {
+	public Msg<?> logout(HttpServletResponse response, HttpServletRequest request) {
 		var auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth != null) {
-			log.info("用户{}登出", auth.getName());
+			log.info("用户 {} 登出", JwtUtil.extractUsername(request.getHeader("Authorization").substring(7)));
 			redisUtil.del(auth.getName());
 			// 清除认证
 			new SecurityContextLogoutHandler().logout(HttpUtil.getHttpServletRequest(), response, auth);

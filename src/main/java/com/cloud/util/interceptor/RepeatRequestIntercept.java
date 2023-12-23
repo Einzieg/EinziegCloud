@@ -26,8 +26,8 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class RepeatRequestIntercept implements HandlerInterceptor {
 
-	private static final int MAX_REQUEST_COUNT = 10;
-	private static final long EXPIRE_TIME = 10;
+	private static final int MAX_REQUEST_COUNT = 60;
+	private static final long EXPIRE_TIME = 60;
 
 	private final RedisUtil redisUtil;
 
@@ -50,6 +50,8 @@ public class RepeatRequestIntercept implements HandlerInterceptor {
 					// 未超过则请求次数+1
 					redisUtil.increasing(key, 1);
 				} else {
+					// 超过则设置过期时间并返回信息
+					redisUtil.set(key, MAX_REQUEST_COUNT, EXPIRE_TIME);
 					// 否则拒绝请求并返回信息
 					Msg.returnMsg(response, ResultCode.TOO_MANY_REQUESTS);
 					return false;

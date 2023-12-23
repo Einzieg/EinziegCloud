@@ -14,7 +14,6 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 public final class RedisUtil {
-
 	@Resource
 	private RedisTemplate<String, Object> redisTemplate;
 
@@ -116,7 +115,7 @@ public final class RedisUtil {
 	public boolean set(String key, Object value, long time) {
 		try {
 			if (time > 0) {
-				redisTemplate.opsForValue().set(key, value, time, TimeUnit.SECONDS);
+				redisTemplate.opsForValue().set(key, String.valueOf(value), time, TimeUnit.SECONDS);
 			} else {
 				set(key, value);
 			}

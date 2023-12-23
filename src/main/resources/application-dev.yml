@@ -21,8 +21,8 @@ spring:
         shutdown-timeout: 1000
   email:
     host: smtp.office365.com
-    username: *
-    password: *
+    username: EinziegCloud@outlook.com
+    password: Wang791348625
     port: 587
 
 management:
@@ -45,7 +45,7 @@ mybatis-plus:
   type-aliases-package: com.cloud.entity
   configuration:
     map-underscore-to-camel-case: true  #开启驼峰命名
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #打印sql
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #打印sql
 
 logging:
   level:

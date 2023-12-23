@@ -15,9 +15,8 @@ public class RedisConfig {
 	public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory factory) {
 		RedisTemplate<Object, Object> template = new RedisTemplate<>();
 		RedisSerializer<String> redisSerializer = new StringRedisSerializer();
-
 		template.setConnectionFactory(factory);
-		//key序列化方式
+		// key序列化
 		template.setKeySerializer(redisSerializer);
 		//value序列化
 		template.setValueSerializer(redisSerializer);

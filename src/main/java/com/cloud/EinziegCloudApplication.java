@@ -31,9 +31,9 @@ public class EinziegCloudApplication {
 	public TomcatProtocolHandlerCustomizer<?> protocolHandlerVirtualThreadExecutorCustomizer() {
 		return protocolHandler -> {
 			System.out.printf("""
-					====================================================================================================
-					Configuring %s to use VirtualThreadPerTaskExecutor
-					====================================================================================================
+					============================================================================================================
+					|| ==> Configuring %s to use VirtualThreadPerTaskExecutor
+					============================================================================================================
 					""", protocolHandler);
 			protocolHandler.setExecutor(Executors.newVirtualThreadPerTaskExecutor());
 		};

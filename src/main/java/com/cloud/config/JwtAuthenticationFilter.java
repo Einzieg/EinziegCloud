@@ -37,6 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		final String jwt;
 		final String userEmail;
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+			// Msg.returnMsg(response, ResultCode.TOKEN_LAPSE);
 			// TODO 重写返回信息
 			filterChain.doFilter(request, response);
 			return;

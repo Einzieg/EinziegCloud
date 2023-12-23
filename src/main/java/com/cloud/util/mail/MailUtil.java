@@ -39,7 +39,6 @@ public class MailUtil {
 	 * @param mailTemplate 邮件模板
 	 */
 	public String sendMail(String to, MailTemplate mailTemplate) throws MessagingException, IOException {
-		System.out.println(USERNAME + " - " + PASSWORD + " - " + HOST + " - " + PORT);
 		Properties props = new Properties();
 		props.put("mail.smtp.host", HOST);
 		props.put("mail.smtp.port", PORT);

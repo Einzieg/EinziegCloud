@@ -6,6 +6,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
@@ -41,6 +42,11 @@ public class ExceptionControllerAdvice {
 	@ExceptionHandler(MalformedJwtException.class)
 	public Msg<?> handleMalformedJwtException(MalformedJwtException e) {
 		return Msg.fail(ResultCode.TOKEN_LAPSE);
+	}
+
+	@ExceptionHandler(HttpMessageNotReadableException.class)
+	public Msg<?> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+		return new Msg<>(ResultCode.BODY_NOT_MATCH, e.getMessage());
 	}
 
 	/**
