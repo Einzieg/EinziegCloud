@@ -1,8 +1,7 @@
 import axios, {type AxiosInstance, type AxiosRequestConfig} from "axios";
 import {push} from "../main";
-// import { useUserStoreHook } from "@/store/modules/user";
-// import { get, merge } from "lodash-es";
 import router from "../router";
+import {useStore} from "../store";
 
 /** 退出登录并强制刷新页面（会重定向到登录页） */
 // function logout() {
@@ -35,9 +34,8 @@ function createService() {
                     return data;
                 case 403:
                     push.error({title: data.msg || "", message: data.data || ""});
-                    localStorage.removeItem("Einzieg_Cloud_Token");
+                    useStore().logoutAction();
                     router.push("/login");
-                // return Promise.reject(new Error("登录已过期，请重新登录"));
                 default:
                     push.error({title: data.msg || "", message: data.data || ""});
                     return Promise.reject(new Error("Error"));
@@ -51,9 +49,9 @@ function createService() {
                     error.message = "请求错误";
                     break;
                 case 403:
-                    error.message = "拒绝访问/认证过期/账号封禁";
-                    localStorage.removeItem("Einzieg_Cloud_Token");
                     router.push("/login");
+                    error.message = "拒绝访问/认证过期/账号封禁";
+                    useStore().logoutAction();
                     break;
                 case 404:
                     router.push("/404");
@@ -93,7 +91,7 @@ function createService() {
 /** 创建请求方法 */
 function createRequest(service: AxiosInstance) {
     return function <T>(config: AxiosRequestConfig): Promise<T> {
-        const token = localStorage.getItem("Einzieg_Cloud_Token");
+        const token = useStore().$state.token;
         const defaultConfig = {
             headers: {
                 // 携带 Token

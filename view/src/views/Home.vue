@@ -1,11 +1,9 @@
 <template>
 	<div class="body">
-		<Menu style="float: left;"/>
-		<div style="margin-left:20px">
-			<div class="home">
-				<h1>Welcome to the Home page</h1>
-			</div>
-
+		<Menu class="menu"/>
+		<div class="box"/>
+		<div class="home">
+			<h1>Welcome to the Home page</h1>
 			<div class="login">
 				<button @click="toLogin">去登录</button>
 			</div>
@@ -31,19 +29,21 @@ import {useRouter} from "vue-router";
 import {push} from "../main";
 import {request} from "../utils/service";
 import Menu from "../components/Menu.vue";
+import {useStore} from "../store";
 
+// 修改Menu中a组件为class="home"的颜色
 
 const router = useRouter();
 
 const logout = () => {
-	var token = localStorage.getItem("Einzieg_Cloud_Token") || null;
+	var token = useStore().$state.token || null;
 	console.log("登出" + token);
 	axios.get(import.meta.env.VITE_BASE_API + "auth/logout", {
 		headers: {
 			"Authorization": "Bearer " + token
 		}
 	}).then((res) => {
-		localStorage.removeItem("Einzieg_Cloud_Token");
+		useStore().logoutAction();
 		router.push("/login");
 		push.success("已登出");
 	});
@@ -71,7 +71,6 @@ async function test2() {
 	} catch (e) {
 		notification.reject("上传失败")
 	}
-
 }
 
 const test3 = () => {
@@ -87,5 +86,13 @@ const test3 = () => {
 <style scoped>
 .body {
 	display: flex;
+}
+
+.box {
+	width: 9%;
+}
+
+.home {
+	bottom: 0;
 }
 </style>

@@ -4,40 +4,21 @@
 	{{ msg }}
 </template>
 
-<script setup lang="ts">
-import axios from "axios";
-// import Message from "../components/Message";
+<script setup>
+import {push} from "../main";
+import {request} from "../utils/service";
 
 let msg = ref("123");
 
 const getData = () => {
-	// axios
-	// 	.get("http://localhost:8118/cloud/user/hello")
-	// 	.then((res) => {
-	// 		if (res.data.code === 200) {
-	// 			Message({
-	// 				text: res.data.msg,
-	// 				type: "success",
-	// 			})
-	// 			msg.value = res.data.data;
-	// 		} else if (res.data.code === 403) {
-	// 			Message({
-	// 				text: res.data.msg,
-	// 				type: "error",
-	// 			})
-	// 			msg.value = res.data.msg;
-	// 		} else if (res.data.code === 429) {
-	// 			Message({
-	// 				text: res.data.msg,
-	// 				type: "error",
-	// 			})
-	// 			msg.value = res.data.msg;
-	// 		}
-	// 		console.log(res);
-	// 	});
-	axios.get("/cloud/user/hello").then((res) => {
-		console.log(res);
+	request({
+		url: "user/hello",
+		method: "get",
+	}).then((res) => {
+		push.success("成功");
+		msg.value = res.data;
 	});
+
 };
 </script>
 

@@ -97,6 +97,7 @@
 <script lang="ts" setup>
 import {useRoute, useRouter} from "vue-router";
 import {push} from "../main";
+import {useStore} from "../store";
 
 const route = useRoute();
 const router = useRouter();
@@ -183,8 +184,7 @@ const login = () => {
 	}).then((res) => {
 		if (res.data.code === 200) {
 			push.success("登录成功");
-			localStorage.setItem("Einzieg_Cloud_Token", res.data.data.token);
-			let returnUrl = "/home";
+			useStore().loginAction(res.data.data);
 			router.push("/home");
 		} else {
 			push.warning({
@@ -209,7 +209,7 @@ const register = () => {
 	}).then((res) => {
 		if (res.data.code === 200) {
 			push.success("注册成功");
-			localStorage.setItem("Einzieg_Cloud_Token", res.data.data.token);
+			useStore().loginAction(res.data.data);
 			let returnUrl = "/home";
 			router.push("/home");
 		} else {

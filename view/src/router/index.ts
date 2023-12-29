@@ -10,39 +10,58 @@ const routes: Array<RouteRecordRaw> = [
     path: "/",
     name: "home",
     component: Home,
-      meta: {requiredAuth: false},
+    meta: {requiredAuth: false},
   },
   {
     path: "/home",
     name: "home",
     component: Home,
-      meta: {requiredAuth: true},
+    meta: {requiredAuth: true},
+  },
+  {
+    path: "/setting",
+    name: "setting",
+    component: () => import("../views/Setting.vue"),
+    meta: {requiredAuth: true},
   },
   {
     path: "/login",
     name: "login",
     component: () => import("../views/login.vue"),
-      meta: {requiredAuth: false},
+    meta: {requiredAuth: false},
   },
   {
     path: "/forget",
     name: "forget",
     component: () => import("../views/ForgetPassword.vue"),
-      meta: {requiredAuth: false},
+    meta: {requiredAuth: false},
   },
   {
     path: "/404",
     name: "404",
     component: () => import("../views/error/404.vue"),
-      meta: {requiredAuth: false},
+    meta: {requiredAuth: false},
   },
 
-    {
-        path: "/menu",
-        name: "menu",
-        component: () => import("../components/Menu.vue"),
-        meta: {requiredAuth: false},
-    },
+  {
+    path: "/menu",
+    name: "menu",
+    component: () => import("../components/Menu.vue"),
+    meta: {requiredAuth: false},
+  },
+  {
+    path: "/night",
+    name: "night",
+    component: () => import("../components/NightAndDayAnimation.vue"),
+    meta: {requiredAuth: false},
+  },
+  {
+    path: "/cloud",
+    name: "cloud",
+    component: () => import("../views/Cloud.vue"),
+    meta: {requiredAuth: true},
+  },
+
   {
     path: "/:pathMatch(.*)*",
     redirect: "/404",
@@ -56,7 +75,7 @@ const router = createRouter({
 
 router.beforeEach((to) => {
   if (to.meta.requiredAuth && !isAuthorization()) {
-      return {name: "login", query: {return: to.path}};
+    return {name: "login", query: {return: to.path}};
   }
   return true;
 });

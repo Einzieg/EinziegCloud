@@ -13,9 +13,13 @@ public enum ResultCode {
 
 	BODY_NOT_MATCH(400, "请求体格式错误"),
 
-	TOKEN_EXPIRED(403, "token已过期"),
+	TOKEN_LAPSE(403, "凭证已失效"),
 
-	TOKEN_LAPSE(403, "token已失效"),
+	TOKEN_FORMAT_ERROR(403, "凭证错误"),
+
+	TOKEN_PARSE_ERROR(403, "凭证解析失败"),
+
+	TOKEN_UNSUPPORTED(403, "不支持的凭证"),
 
 	BAD_CREDENTIALS(403, "账号或密码错误"),
 

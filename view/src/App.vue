@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {Notivue, Notifications} from 'notivue'
+import {Notifications, Notivue} from 'notivue'
 </script>
 <template>
 	<router-view/>

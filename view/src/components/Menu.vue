@@ -1,65 +1,72 @@
 <template>
 	<div class="body">
-		<ul>
-			<li>
-				<a href="#">
-					<SvgIcon icon-class="home"/>
-					<span>主页</span>
-				</a>
-			</li>
-			<li>
-				<a href="#">
-					<SvgIcon icon-class="+"/>
-					<span>+</span>
-				</a>
-			</li>
-			<li>
-				<a href="#">
-					<SvgIcon icon-class="+"/>
-					<span>+1</span>
-				</a>
-			</li>
-			<li>
-				<a href="#">
-					<SvgIcon icon-class="+"/>
-					<span>+</span>
-				</a>
-			</li>
+		<div class="tree">
+			<ul>
+				<li>
+					<a href="#">
+						<router-link to="home">
+							<SvgIcon icon-class="HomeOutline"/>
+							<span>主页</span>
+						</router-link>
+					</a>
+				</li>
+				<li>
+					<a href="#">
+						<SvgIcon icon-class="+"/>
+						<span>+</span>
+					</a>
+				</li>
+				<li>
+					<a href="#">
+						<SvgIcon icon-class="+"/>
+						<span>+1</span>
+					</a>
+				</li>
+				<li>
+					<a href="#">
+						<SvgIcon icon-class="+"/>
+						<span>+</span>
+					</a>
+				</li>
 
-			<li>
-				<a href="#">
-					<SvgIcon icon-class="+"/>
-					<span>+</span>
-				</a>
-			</li>
-			<li>
-				<a href="#">
-					<SvgIcon icon-class="cloud"/>
-					<span>云</span>
-				</a>
-			</li>
+				<li>
+					<a href="#">
+						<SvgIcon icon-class="+"/>
+						<span>+</span>
+					</a>
+				</li>
+				<li>
+					<a href="#">
+						<router-link to="cloud">
+							<SvgIcon icon-class="cloud"/>
+							<span>云</span>
+						</router-link>
+					</a>
+				</li>
 
+				<li>
+					<a href="#">
+						<SvgIcon icon-class="PersonCircle24Regular"/>
+						<span>个人中心</span>
+					</a>
+				</li>
+				<li>
+					<a href="#">
+						<SvgIcon icon-class="mail"/>
+						<span>消息</span>
+					</a>
+				</li>
+				<li>
+					<a href="#">
+						<RouterLink to="setting">
+							<SvgIcon icon-class="setting"/>
+							<span>设置</span>
+						</RouterLink>
+					</a>
+				</li>
 
-			<li>
-				<a href="#">
-					<SvgIcon icon-class="PersonCircle24Regular"/>
-					<span>个人中心</span>
-				</a>
-			</li>
-			<li>
-				<a href="#">
-					<SvgIcon icon-class="mail"/>
-					<span>消息</span>
-				</a>
-			</li>
-			<li>
-				<a href="#">
-					<SvgIcon icon-class="setting"/>
-					<span>设置</span>
-				</a>
-			</li>
-
-		</ul>
+			</ul>
+		</div>
 	</div>
 </template>
 
@@ -68,13 +75,24 @@ import SvgIcon from "./SvgIcon.vue";
 </script>
 
 <style scoped>
+.router-link-active {
+	color: aquamarine;
+}
+
 * {
 	margin: 0;
 	padding: 0;
 }
 
-/* 初始化样式+页面居中 */
 .body {
+	top: 0;
+	left: 0;
+	position: fixed;
+	bottom: 0;
+}
+
+/* 初始化样式+页面居中 */
+.tree {
 	margin-left: 12px;
 	height: 100vh;
 	display: flex;
@@ -157,5 +175,9 @@ ul a:focus span,
 ul a:active span {
 	opacity: 1;
 	transform: scale(1);
+}
+
+.current {
+	color: aquamarine;
 }
 </style>

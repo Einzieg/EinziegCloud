@@ -116,7 +116,13 @@ public class AuthenticationService extends ServiceImpl<AuthenticationMapper, Aut
 		user.setLastLoginIp(IPUtil.getIpAddr());
 		user.setToken(jwtToken);
 		userService.updateById(user);
-		return Msg.success(AuthenticationResponse.builder().token(jwtToken).build());
+		var response = AuthenticationResponse.builder()
+				.token(jwtToken)
+				.name(user.getName())
+				.email(user.getEmail())
+				.build();
+		log.info("用户 [{}] 登录成功", user.getName());
+		return Msg.success(response);
 	}
 
 	/**
@@ -127,7 +133,7 @@ public class AuthenticationService extends ServiceImpl<AuthenticationMapper, Aut
 	public Msg<?> logout(HttpServletResponse response, HttpServletRequest request) {
 		var auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth != null) {
-			log.info("用户 {} 登出", JwtUtil.extractUsername(request.getHeader("Authorization").substring(7)));
+			log.info("用户 [{}] 登出", JwtUtil.extractUsername(request.getHeader("Authorization").substring(7)));
 			redisUtil.del(auth.getName());
 			// 清除认证
 			new SecurityContextLogoutHandler().logout(HttpUtil.getHttpServletRequest(), response, auth);

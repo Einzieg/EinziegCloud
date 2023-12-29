@@ -4,12 +4,14 @@ import com.cloud.util.msg.Msg;
 import com.cloud.util.msg.ResultCode;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -30,7 +32,7 @@ public class ExceptionControllerAdvice {
 	 */
 	@ExceptionHandler(ExpiredJwtException.class)
 	public Msg<?> handleExpiredJwtException(ExpiredJwtException e) {
-		return Msg.fail(ResultCode.TOKEN_EXPIRED);
+		return Msg.fail(ResultCode.TOKEN_LAPSE);
 	}
 
 	/**
@@ -41,7 +43,7 @@ public class ExceptionControllerAdvice {
 	 */
 	@ExceptionHandler(MalformedJwtException.class)
 	public Msg<?> handleMalformedJwtException(MalformedJwtException e) {
-		return Msg.fail(ResultCode.TOKEN_LAPSE);
+		return Msg.fail(ResultCode.TOKEN_FORMAT_ERROR);
 	}
 
 	@ExceptionHandler(HttpMessageNotReadableException.class)
@@ -77,7 +79,17 @@ public class ExceptionControllerAdvice {
 	}
 
 	/**
-	 * 账户禁用异常
+	 * 不支持的JWT-TOKEN
+	 * @param e {@link UnsupportedJwtException}
+	 * @return {@code Msg<?>}
+	 */
+	@ExceptionHandler(UnsupportedJwtException.class)
+	public Msg<?> handleUnsupportedJwtException(UnsupportedJwtException e) {
+		return Msg.fail(ResultCode.TOKEN_UNSUPPORTED);
+	}
+
+	/**
+	 * 账户禁用
 	 *
 	 * @param e {@link DisabledException}
 	 * @return {@code Msg<?>}
@@ -96,6 +108,11 @@ public class ExceptionControllerAdvice {
 	@ExceptionHandler(LockedException.class)
 	public Msg<?> handleLockedException(LockedException e) {
 		return Msg.fail(ResultCode.LOCKED);
+	}
+
+	@ExceptionHandler(UsernameNotFoundException.class)
+	public Msg<?> handleUsernameNotFoundException(UsernameNotFoundException e) {
+		return Msg.fail(ResultCode.BAD_CREDENTIALS);
 	}
 
 	/**
