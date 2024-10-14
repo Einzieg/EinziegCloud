@@ -42,7 +42,6 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("../views/error/404.vue"),
     meta: {requiredAuth: false},
   },
-
   {
     path: "/menu",
     name: "menu",
@@ -81,7 +80,7 @@ router.beforeEach((to) => {
 });
 
 function isAuthorization() {
-  let USER = localStorage.getItem("Einzieg_Cloud_Token");
+  let USER = localStorage.getItem("EinziegCloud_Token");
   return !!USER;
 }
 

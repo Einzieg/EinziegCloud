@@ -102,7 +102,6 @@ public class AuthenticationService extends ServiceImpl<AuthenticationMapper, Aut
 	 * @return {@code AuthenticationResponse}
 	 */
 	public Msg<?> login(AuthenticationRequest auth) {
-		log.info("name: {}, password: {}", auth.getUsername(), auth.getPassword());
 		authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(
 						auth.getUsername(),

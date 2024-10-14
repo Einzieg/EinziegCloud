@@ -61,23 +61,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		try {
 			userName = JwtUtil.extractUsername(jwt);
 		} catch (ExpiredJwtException e) {
-			System.out.println("jwt过期===================" + e);
-			resolver.resolveException(request, response, null, new ExpiredJwtException(null, null, null));
+			resolver.resolveException(request, response, null, new ExpiredJwtException(null, null, "过期的TOKEN"));
 			return;
 		} catch (UnsupportedJwtException e) {
-			System.out.println("jwt不支持===================" + e);
-			resolver.resolveException(request, response, null, new UnsupportedJwtException(null, null));
+			resolver.resolveException(request, response, null, new UnsupportedJwtException("不支持的TOKEN", null));
 			return;
 		} catch (MalformedJwtException e) {
-			System.out.println("jwt格式错误===================" + e);
-			resolver.resolveException(request, response, null, new MalformedJwtException(null, null));
+			resolver.resolveException(request, response, null, new MalformedJwtException("错误的TOKEN", null));
 			return;
 		} catch (SignatureException e) {
-			System.out.println("jwt签名错误===================" + e);
-			resolver.resolveException(request, response, null, new SignatureException(null, null));
+			resolver.resolveException(request, response, null, new SignatureException("签名错误", null));
 			return;
 		} catch (Exception e) {
-			System.out.println("jwt验证失败===================" + e);
 			resolver.resolveException(request, response, null, new Exception("凭证解析失败", null));
 			return;
 		}
@@ -90,7 +85,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				return;
 			}
 			if (!userDetails.isAccountNonLocked() || !userDetails.isEnabled()) {
-				// TODO 重写返回信息
 				filterChain.doFilter(request, response);
 				return;
 			}

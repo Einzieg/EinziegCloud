@@ -31,10 +31,9 @@ export default defineConfig({
             ],
 
             dts: "./auto-imports.d.ts",
-            // eslint报错解决
             eslintrc: {
-                enabled: false, // Default `false`
-                filepath: "./.eslintrc-auto-import.json", // Default `./.eslintrc-auto-import.json`
+                enabled: false,
+                filepath: "./.eslintrc-auto-import.json",
                 globalsPropValue: true, // Default `true`, (true | false | 'readonly' | 'readable' | 'writable' | 'writeable')
             },
         }),
@@ -45,11 +44,15 @@ export default defineConfig({
                 modules.map((m) => {
                     m.importers = new Set();
                 });
-
                 return modules;
             },
         },
     ],
+    resolve: {
+        alias: {
+            "@": path.resolve(__dirname, "src"),
+        },
+    },
     optimizeDeps: {
         include: ["axios"],
     },

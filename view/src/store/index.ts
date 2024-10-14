@@ -1,6 +1,6 @@
 import {defineStore} from "pinia";
 
-export const useStore = defineStore("EinziegCloud", {
+export const useStore = defineStore("EinziegCloud_Token", {
     persist: true,
     state: () => {
         return {
